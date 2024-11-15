@@ -11,7 +11,7 @@ This code simulates the dynamics of a finite Markov chain given:
 
 Output:
 
-- The  evolution of a small number of sample paths
+- The  evolution of a of sample path
 - The proportion of final states (histogram and actual values)
 
 ## Note: ## 
