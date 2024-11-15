@@ -7,7 +7,6 @@ This code simulates the dynamics of a finite Markov chain given:
 - The initial state (an integer between 1 and K)
 - The number of time steps
 - The number of simulations
-- A small number of simulations to be graphed
 
 Output:
 
