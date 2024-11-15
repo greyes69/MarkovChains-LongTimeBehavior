@@ -1,1 +1,20 @@
-Given a finite Markov Chain, this code simulates the dynamics starting from any given state for any given number of time steps. The simulation is repeated as many times as given. The output  optionally includes the  evolution for some of the experiments and the proportion of final states. If the transition matrix is regular, the limit distribution is the stationary one, given by the eigenvector with eigenvalue =1 (experimental confirmation of Perron-Frobenius Theorem). 
+## Generating sample paths of finite Markov Chains
+
+This code simulates the dynamics of a finite Markov chain given:
+
+- The size of the chain (K)
+- The transition matrix
+- The initial state (an integer between 1 and K)
+- The number of time steps
+- The number of simulations
+- A small number of simulations to be graphed
+
+Output:
+
+- The  evolution of a small number of sample paths
+- The proportion of final states (histogram and actual values)
+
+## Note: ## 
+
+If the transition matrix is regular, the limit distribution (proportion) is the stationary one, given by the eigenvector with eigenvalue =1 (Perron-Frobenius Theorem). 
+
