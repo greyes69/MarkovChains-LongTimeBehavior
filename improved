@@ -1,0 +1,110 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from collections import Counter
+
+# Function to input and validate the transition matrix
+def input_transition_matrix(K):
+    TransitionMatrix = np.zeros((K, K), dtype=float)
+    for i in range(K):
+        while True:  # Loop until the current row is valid
+            try:
+                row = list(map(float, input(f"Enter elements of row {i + 1}, separated by spaces: ").split()))
+                
+                if len(row) != K:
+                    print(f"Error: The number of elements in row {i + 1} must be exactly {K}. Please re-enter this row.")
+                    continue
+                
+                if not np.isclose(sum(row), 1):
+                    print(f"Error: The elements of row {i + 1} must sum to 1. Current sum is {sum(row):.2f}. Please re-enter this row.")
+                    continue
+                
+                # If the row is valid, save it and move to the next
+                TransitionMatrix[i] = row
+                break
+            except ValueError:
+                print("Error: Invalid input detected. Please enter numeric values only.")
+    return TransitionMatrix
+
+# Input the size of the Markov chain
+K = int(input("Enter the size of the chain (number of states): "))
+
+# Input and validate the Transition Matrix
+TransitionMatrix = input_transition_matrix(K)
+
+# Function to check if the matrix is regular
+def is_regular(matrix):
+    power_limit = (K - 1) ** 2 + 1  # Maximum power to check
+    current_power = matrix.copy()
+    
+    for power in range(1, power_limit + 1):
+        current_power = np.linalg.matrix_power(matrix, power)
+        if np.all(current_power > 0):
+            return True, power
+    return False, None
+
+# Check regularity of the transition matrix
+regular, power_found = is_regular(TransitionMatrix)
+if regular:
+    print(f"The transition matrix is regular (all positive entries found at power {power_found}).")
+else:
+    print("The transition matrix is NOT regular (no power up to (n-1)^2 + 1 has all positive entries).")
+
+# Number of iterations (experiments) and time steps
+rows = int(input("Enter the number of iterations: "))
+cols = int(input("Enter the number of time steps: "))
+
+# Initialize the Matrix of States
+MatrixOfStates = np.zeros((rows, cols), dtype=int)
+
+# Function to perform a single transition based on the current state
+def transit(M, current_state):
+    return np.random.choice(np.arange(1, K + 1), p=M[current_state - 1])
+
+# Run simulations, starting from a random state for each iteration
+FinalStates = []
+for n in range(rows):
+    current_state = np.random.choice(np.arange(1, K + 1))  # Random initial state
+    MatrixOfStates[n, 0] = current_state
+
+    for t in range(1, cols):
+        current_state = transit(TransitionMatrix, current_state)
+        MatrixOfStates[n, t] = current_state
+    
+    FinalStates.append(current_state)
+
+# Plot sample paths for multiple experiments
+plt.figure(figsize=(15, 6))
+for n in range(min(3, rows)):  # Plot the first three sample paths
+    plt.plot(MatrixOfStates[n, :], linestyle='-', marker='o', label=f'Experiment {n + 1}')
+plt.xlabel('Time Steps')
+plt.ylabel('State')
+plt.title('Sample Paths of the Markov Chain')
+plt.legend()
+plt.show()
+
+# Create a histogram of final states
+value_counts = Counter(FinalStates)
+sorted_counts = dict(sorted(value_counts.items()))
+
+unique_values = list(sorted_counts.keys())
+proportions = [count / len(FinalStates) for count in sorted_counts.values()]
+# Plot histogram
+plt.bar(unique_values, proportions, edgecolor="black")
+plt.xlabel('Final State')
+plt.ylabel('Proportion')
+plt.title('Histogram of Final State Proportions')
+plt.show()
+
+# Display proportions
+print("Asymptotic proportions:", proportions)
+
+# Convert data to a DataFrame for a tabular view of state transitions
+columns = [f"t={t}" for t in range(cols)]
+df = pd.DataFrame(MatrixOfStates, columns=columns)
+
+# Show the first and last few rows of the state transition data
+print("First few rows of the state transition table:")
+print(df.head())
+print("\nLast few rows of the state transition table:")
+print(df.tail())
